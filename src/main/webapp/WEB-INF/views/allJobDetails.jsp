@@ -129,14 +129,19 @@ h2 {
 							<p class="apply-button">
 								<c:choose>
 									<c:when test="${not empty loggedInUser}">
-										<a href="${job.applyLink}" target="_blank"
-											class="btn btn-primary">Apply</a>
+										
+										<a href="applyJob?jobId=${job.jid}" class="btn btn-primary">
+    Apply
+</a>
+										
 									</c:when>
 									<c:otherwise>
-										<a href="login" class="btn btn-secondary">Login to Apply</a>
+										<a href="login" class="btn btn-secondary"> Login to Apply
+										</a>
 									</c:otherwise>
 								</c:choose>
 							</p>
+
 
 						</div>
 					</c:forEach>

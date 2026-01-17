@@ -8,9 +8,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.project.model.Job;
 import com.project.model.User;
+import com.project.service.EmailService;
 import com.project.service.JobService;
 
 import jakarta.servlet.http.HttpSession;
@@ -19,8 +21,14 @@ import jakarta.servlet.http.HttpSession;
 public class JobController {
 
 	@Autowired
-	JobService jobService;
+	private JobService jobService;
+
+	@Autowired
+	private EmailService emailService;
+
 	String msg;
+
+	// ================= ADD JOB (ADMIN) =================
 
 	@GetMapping("/add-job")
 	public String showAddJobForm(HttpSession session, Model model) {
@@ -48,15 +56,16 @@ public class JobController {
 		}
 	}
 
+	// ================= VIEW JOBS =================
+
 	@GetMapping("/see-allJobs")
 	public String getAllJobs(HttpSession session, Model model) {
 		User user = (User) session.getAttribute("loggedInUser");
 		if (user == null) {
-			return "login"; // redirect to login.jsp if not logged in
+			return "login";
 		}
 
 		List<Job> allJobs = jobService.seeAllJobs();
-
 		String preferedJobs = user.getPreferedJobs();
 
 		List<Job> filteredJobs = new ArrayList<>();
@@ -77,5 +86,19 @@ public class JobController {
 		return "allJobDetails";
 	}
 
-	
+	// ================= APPLY JOB =================
+
+	@GetMapping("/applyJob")
+	public String showApplyJobPage() {
+		return "applyJob"; // applyJob.jsp
+	}
+
+	@PostMapping("/applyJob")
+	public String applyJob(@RequestParam String email) {
+
+	    emailService.sendApplicationMail(email);
+
+	    return "redirect:/see-allJobs";
+	}
+
 }
