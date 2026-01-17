@@ -89,16 +89,51 @@ public class JobController {
 	// ================= APPLY JOB =================
 
 	@GetMapping("/applyJob")
-	public String showApplyJobPage() {
-		return "applyJob"; // applyJob.jsp
+	public String showApplyJobPage(HttpSession session, Model model) {
+
+	    User user = (User) session.getAttribute("loggedInUser");
+
+	    if (user == null) {
+	        return "login";
+	    }
+
+	    model.addAttribute("user", user);
+	    return "applyJob";
 	}
 
+
+
 	@PostMapping("/applyJob")
-	public String applyJob(@RequestParam String email) {
+	public String applyJob(@RequestParam String email, HttpSession session) {
 
-	    emailService.sendApplicationMail(email);
+		String otp = String.valueOf((int) (Math.random() * 900000) + 100000);
 
-	    return "redirect:/see-allJobs";
+		session.setAttribute("otp", otp);
+		session.setAttribute("email", email);
+
+		emailService.sendOtpMail(email, otp);
+
+		return "verifyOtp";
+	}
+
+	@PostMapping("/verifyOtp")
+	public String verifyOtp(@RequestParam String otp, HttpSession session) {
+
+		String sessionOtp = (String) session.getAttribute("otp");
+		String email = (String) session.getAttribute("email");
+
+		if (sessionOtp != null && sessionOtp.equals(otp)) {
+
+			// OTP used once. Kill it.
+			session.removeAttribute("otp");
+
+			// ✅ SEND CONFIRMATION MAIL HERE (THIS IS THE KEY)
+			emailService.sendApplicationMail(email);
+
+			return "applySuccess";
+		}
+
+		return "verifyOtp";
 	}
 
 }

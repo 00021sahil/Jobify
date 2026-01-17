@@ -25,4 +25,20 @@ public class EmailService {
 
         mailSender.send(message);
     }
+    
+    
+    public void sendOtpMail(String toEmail, String otp) {
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(toEmail);
+        message.setSubject("Your OTP Verification Code");
+        message.setText(
+            "Your OTP is: " + otp + "\n\n" +
+            "This OTP is valid for 5 minutes.\n\n" +
+            "Regards,\nJobify Team"
+        );
+
+        mailSender.send(message);
+    }
+
 }
